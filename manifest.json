@@ -4,14 +4,15 @@
     "version": "0.0.1",
     "description": "Auto fill SAB",
     "icons": {
-        "64": "src/images/64x64.png"
+        "64": "src/images/64x64.png",
+        "128": "src/images/128x128.png"
     },
     "content_scripts": [
         {
-            "matches": ["*://booking.hessel.dk/*", "*://booking.dev-hessel.dk/*", "*://booking.staging-hessel.dk/*", "*://localhost:*/*"],
+            "matches": ["*://booking.hessel.dk/*", "*://booking.dev-hessel.dk/*", "*://booking.staging-hessel.dk/*", "*://localhost/*"],
             "js": ["src/js/in-content.js"]
         }
     ],
     "offline_enabled": true,
-    "permissions": ["*://booking.hessel.dk/*", "activeTab", "storage"]
+    "permissions": ["activeTab"]
 }
