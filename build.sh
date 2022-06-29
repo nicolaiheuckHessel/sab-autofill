@@ -1,1 +1,1 @@
-zip -r extension.zip .
+zip -r dist/SAB-AutoFill.zip .

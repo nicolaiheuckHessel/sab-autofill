@@ -13,5 +13,9 @@
             "js": ["src/js/in-content.js"]
         }
     ],
+    "browser_action": {
+        "default_popup": "src/views/profiles.html",
+        "default_title": "Edit profiles"
+    },
     "permissions": ["activeTab", "storage"]
 }

@@ -1,8 +1,36 @@
-const isSAB = () => {
-    const testField = document.getElementById("YourCar:Email");
-    return testField !== null;
-}
+//#region Variables
+let allDivs = [];
+let workshopDiv;
+let profiles = [
+    {
+        name: "Empty",
+        email: '',
+        phone: '',
+        regNr: '',
+        kmDriven: '',
+        workshop: 'Randers'
+    },
+    {
+        name: "Default profile",
+        email: "c.holmgaard@hessel.dk",
+        phone: '40283135',
+        regNr: 'ca88874',
+        kmDriven: '1234',
+        workshop: 'Randers'
+    },
+    {
+        name: "Correct profile",
+        email: "c.holmgaard@hessel.dk",
+        phone: '28403135',
+        regNr: 'ca88874',
+        kmDriven: '1234',
+        workshop: 'Aarhus'
+    },
+];
+const profileKey = "SAB-Profiles";
+//#endregion
 
+//#region Setting values
 const setField = (id, value) => {
     const node = document.getElementById(id);
     const setValue = Object.getOwnPropertyDescriptor(node.__proto__, 'value').set;
@@ -16,6 +44,30 @@ const dispatchFocusEvent = () => {
     element.focus();
     element.blur();
 }
+const setWorkshop = (value) => {
+    const intervalId = setInterval(() => {
+        if (intervalId === 0) return;
+        
+        const dropdownDisabled = workshopDiv.attributes["disabled"] !== undefined;
+        if (dropdownDisabled) return;
+        
+        workshopDiv.click();
+        const list = Array.from(workshopDiv.parentElement.getElementsByTagName("ul")[0].children);
+        const targetOption = list.filter(li => li.innerText == value)[0];
+
+        if (targetOption === null || targetOption === undefined) {
+            alert(`Option ${value} not found in dropdown`)
+            clearInterval(intervalId);
+            return;
+        }
+
+        targetOption.click();
+        clearInterval(intervalId);
+    }, 100);
+}
+//#endregion
+
+//#region Creating elements
 const createButton = () => {
     const button = document.createElement("button")
     button.innerText = "Fill Form";
@@ -26,27 +78,15 @@ const createButton = () => {
 const createSelect = () => {
     const select = document.createElement("select");
     select.style = "width: 200px";
-    console.log("Creating empty option");
-    select.options.add(document.createElement("option"))
-    console.log("Looping profiles");
+    let i = 0;
     for (const profile of profiles) {
-        console.log("Loop profile " + profile.name);
-    select.options.add(createOption(profile.name, profile.id))
+        select.options.add(createOption(profile.name, `${i++}`))
     }
-    console.log("Profiles looped");
 
-    select.onchange = (e) => fillForm(e.target.value);
+    select.onchange = (e) => {
+        fillForm(e.target.value);
+    }
     return select;
-}
-const injectElements = () => {
-    console.log("Creating div");
-    const container = document.createElement("div");
-    console.log("Creating select");
-    container.append(createSelect());
-    console.log("Created select");
-    // container.append(createButton());
-    console.log("Injecting div");
-    document.getElementsByTagName("header")[0].children[0].append(container);
 }
 const createOption = (name, id) => {
     const option = document.createElement("option");
@@ -54,27 +94,14 @@ const createOption = (name, id) => {
     option.value = id;
     return option;
 }
+//#endregion
 
-const profiles = [
-    {
-        id: 1,
-        name: "Default profile",
-        email: "c.holmgaard@hessel.dk",
-        phone: '40283135',
-        regNr: 'ca88874',
-        kmDriven: '1234',
-        workshop: 'Randers'
-    },
-    {
-        id: 2,
-        name: "Correct profile",
-        email: "c.holmgaard@hessel.dk",
-        phone: '28403135',
-        regNr: 'ca88874',
-        kmDriven: '1234',
-        workshop: 'Randers'
-    },
-];
+const injectElements = () => {
+    const container = document.createElement("div");
+    container.append(createSelect());
+    document.getElementsByTagName("header")[0].children[0].append(container);
+    console.log("SAB AutoFill loaded");
+}
 
 const fillForm = (profileIndex) => {
     const profile = profiles[profileIndex];
@@ -82,9 +109,9 @@ const fillForm = (profileIndex) => {
         ["YourCar:Email", profile.email],
         ["YourCar:Telephone number", profile.phone],
         ["YourCar:Car Registration Number", profile.regNr],
-        ["YourCar:Driven Kilometers", profile.kmDriven]
+        ["YourCar:Driven Kilometers", profile.kmDriven],
     ];
-    const multiplier = 50;
+    const delayMultiplier = 50;
     let i = 0;
     for (const fieldValuePair of fieldAndValues) {
         const id = fieldValuePair[0];
@@ -92,19 +119,42 @@ const fillForm = (profileIndex) => {
 
         setTimeout(() => {
             setField(id, value);
-        }, multiplier * i);
+        }, delayMultiplier * i);
 
         i++;
     }
     
     setTimeout(() => {
         dispatchFocusEvent();
-    }, multiplier * i);
+    }, delayMultiplier * i++);
+    setTimeout(() => {
+        setWorkshop(profile.workshop);
+    }, delayMultiplier * i);
+}
+const isSAB = () => {
+    const testField = document.getElementById("YourCar:Email");
+    return testField !== null;
+}
+const scanPage = () => {
+    allDivs = Array.from(document.getElementsByTagName("div"));
+    workshopDiv = allDivs.filter(t => t.attributes["disabled"] !== undefined)[0]
 }
 
 const main = () => {
     if (!isSAB) return;
 
-    injectElements();
+    browser.storage.local.get(profileKey).then((data) => {
+        if (data[profileKey] === undefined) {
+            data[profileKey] = profiles;
+            browser.storage.local.set(data);
+        }
+        profiles = data[profileKey];
+        console.log(profiles);
+
+        scanPage();
+        injectElements();
+    });
+
 }
+
 main();
