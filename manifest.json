@@ -13,6 +13,5 @@
             "js": ["src/js/in-content.js"]
         }
     ],
-    "offline_enabled": true,
-    "permissions": ["activeTab"]
+    "permissions": ["activeTab", "storage"]
 }
