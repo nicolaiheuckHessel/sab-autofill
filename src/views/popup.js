@@ -13,13 +13,13 @@
         {
             name: 'Default profile',
             email: 'c.holmgaard@hessel.dk',
-            phone: '40283135',
+            phone: '28403135',
             regNr: 'ca88874',
             kmDriven: '1234',
             workshop: 'Randers'
         },
         {
-            name: 'Correct profile',
+            name: 'Aarhus',
             email: 'c.holmgaard@hessel.dk',
             phone: '28403135',
             regNr: 'ca88874',
